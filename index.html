@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Subscriber Booster</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://i.imgur.com/V9sff4B.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 25px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        h1 {
+            color: #ff0000;
+            margin-bottom: 15px;
+            font-size: clamp(1.8em, 5vw, 2.5em);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: clamp(0.9em, 3vw, 1.1em);
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        input[type="url"] {
+            width: 100%;
+            padding: 15px 20px;
+            border: 3px solid rgba(255, 0, 0, 0.2);
+            border-radius: 15px;
+            font-size: clamp(14px, 4vw, 16px);
+            text-align: center;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        input[type="url"]:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            transform: scale(1.02);
+        }
+
+        .channel-url {
+            color: #ff4444;
+            font-size: clamp(12px, 3vw, 14px);
+            font-weight: 600;
+            margin-top: 5px;
+            background: rgba(255, 0, 0, 0.1);
+            padding: 8px 12px;
+            border-radius: 20px;
+            border-left: 4px solid #ff0000;
+        }
+
+        .subscriber-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .subscriber-btn {
+            padding: 14px 8px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: clamp(14px, 4vw, 16px);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 60px;
+        }
+
+        .subscriber-btn:hover:not(.disabled) {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 12px 25px rgba(255,107,107,0.4);
+        }
+
+        .subscriber-btn.selected {
+            background: linear-gradient(45deg, #00ff88, #00ffaa);
+            box-shadow: 0 0 25px rgba(0,255,136,0.6);
+            transform: scale(1.08);
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #ff0000, #ff4444);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            font-size: clamp(16px, 4vw, 18px);
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .start-btn:hover:not(.disabled) {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(255,0,0,0.4);
+        }
+
+        .start-btn.disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.6;
+        }
+
+        .progress-section {
+            display: none;
+            margin-top: 25px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 22px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 13px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255,255,0,0.5);
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .status-text {
+            font-size: clamp(16px, 4vw, 20px);
+            font-weight: bold;
+            margin: 15px 0;
+            min-height: 28px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        #currentSubs {
+            font-size: clamp(24px, 8vw, 32px);
+            font-weight: bold;
+            color: #00ff88;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-top: 10px;
+        }
+
+        .awaiting-verification {
+            color: #ffaa00 !important;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .verify-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .verify-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 40px 30px;
+            border-radius: 25px;
+            text-align: center;
+            max-width: 380px;
+            width: 95%;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            border: 3px solid rgba(255, 107, 53, 0.3);
+            transform: scale(0.9);
+            animation: popupIn 0.4s ease forwards;
+        }
+
+        @keyframes popupIn {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .verify-title {
+            color: #ff4444;
+            font-size: clamp(20px, 6vw, 26px);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .verify-text {
+            font-size: clamp(14px, 4vw, 16px);
+            margin-bottom: 25px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .verify-btn {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: clamp(16px, 4.5vw, 18px);
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 25px rgba(255,107,53,0.4);
+        }
+
+        .verify-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(255,107,53,0.6);
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                background-attachment: scroll;
+            }
+            
+            .container {
+                padding: 25px 20px;
+                margin: 10px;
+                border-radius: 20px;
+            }
+            
+            .subscriber-options {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+            
+            .subscriber-btn {
+                padding: 12px 6px;
+                min-height: 55px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .subscriber-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 YouTube Subscriber Booster</h1>
+        <p class="subtitle">Get instant subscribers with our premium booster tool!</p>
+        
+        <div class="input-group">
+            <input type="url" id="channelUrl" placeholder="https://www.youtube.com/@YourChannelName" required>
+            <div class="channel-url" id="displayUrl"></div>
+        </div>
+
+        <div class="subscriber-options" id="subscriberOptions">
+            <button class="subscriber-btn" data-subs="500">500</button>
+            <button class="subscriber-btn" data-subs="1500">1.5K</button>
+            <button class="subscriber-btn" data-subs="2000">2K</button>
+            <button class="subscriber-btn" data-subs="2500">2.5K</button>
+            <button class="subscriber-btn" data-subs="3000">3K</button>
+            <button class="subscriber-btn" data-subs="5000">5K</button>
+            <button class="subscriber-btn" data-subs="6000">6K</button>
+            <button class="subscriber-btn" data-subs="10000">10K</button>
+        </div>
+
+        <button class="start-btn" id="startBtn" disabled>Start Adding Subscribers</button>
+
+        <div class="progress-section" id="progressSection">
+            <div class="status-text" id="statusText">Ready to boost your channel...</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div id="currentSubs"></div>
+        </div>
+    </div>
+
+    <div class="verify-popup" id="verifyPopup">
+        <div class="verify-card">
+            <h2 class="verify-title">⚠️ Quick Manual Verification</h2>
+            <p class="verify-text">
+                You need to perform a quick manual verification to successfully add subscribers to your channel.
+            </p>
+            <button class="verify-btn" id="verifyBtn">Click to Verify Now</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedSubs = 0;
+        let simulationInterval;
+        let currentAdded = 0;
+        let targetSubs = 0;
+        let verificationStarted = false;
+
+        // Subscriber buttons
+        document.querySelectorAll('.subscriber-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.subscriber-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedSubs = parseInt(btn.dataset.subs);
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('startBtn').textContent = `Boost +${selectedSubs.toLocaleString()} Subscribers`;
+            });
+        });
+
+        // Channel URL input
+        document.getElementById('channelUrl').addEventListener('input', (e) => {
+            const url = e.target.value;
+            const display = document.getElementById('displayUrl');
+            if (url) {
+                display.textContent = `Channel: ${url.replace('https://www.youtube.com/', '').replace('https://youtube.com/', '').replace('https://www.youtube.com/c/', '')}`;
+            } else {
+                display.textContent = '';
+            }
+        });
+
+        // Start button
+        document.getElementById('startBtn').addEventListener('click', startSimulation);
+
+        function startSimulation() {
+            const channelUrl = document.getElementById('channelUrl').value;
+            if (!channelUrl || selectedSubs === 0) return;
+
+            document.getElementById('subscriberOptions').style.display = 'none';
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('progressSection').style.display = 'block';
+
+            targetSubs = selectedSubs;
+            currentAdded = 0;
+            verificationStarted = false;
+            
+            // Start simulation
+            simulationInterval = setInterval(simulateAdding, 250);
+        }
+
+        function simulateAdding() {
+            const statusText = document.getElementById('statusText');
+            const progressFill = document.getElementById('progressFill');
+            const currentSubsEl = document.getElementById('currentSubs');
+
+            // Stop adding subscribers once verification is started
+            if (verificationStarted) {
+                statusText.innerHTML = '⏳ <span class="awaiting-verification">Awaiting Successful Verification To Add Your Subscribers</span>';
+                return;
+            }
+
+            currentAdded += Math.floor(Math.random() * 60) + 15;
+            
+            // Don't complete simulation - wait for verification
+            if (currentAdded >= targetSubs * 0.6) { // Stop at 60% max
+                currentAdded = targetSubs * 0.6;
+            }
+            
+            const progress = (currentAdded / targetSubs) * 100;
+            progressFill.style.width = Math.min(progress, 60) + '%';
+            currentSubsEl.textContent = `+${Math.floor(currentAdded).toLocaleString()}/${targetSubs.toLocaleString()}`;
+
+            // Rotating status messages (until verification)
+            const messages = [
+                '🔄 Adding subscribers to your channel...',
+                '📈 Connecting to YouTube API...',
+                '⚡ Generating real subscribers...',
+                '🌐 Bypassing rate limits...',
+                '✅ Subscribers are joining your channel!',
+                '🎯 Targeting your audience demographics...',
+                '💎 Premium subscribers incoming...'
+            ];
+            
+            statusText.textContent = messages[Math.floor(Date.now() / 1000) % messages.length];
+
+            // Show verification popup at ~45-55%
+            if (progress >= 45 && progress < 55 && !document.getElementById('verifyPopup').style.display) {
+                setTimeout(() => {
+                    statusText.textContent = '⏳ Awaiting verification... 🔐';
+                    document.getElementById('verifyPopup').style.display = 'flex';
+                }, 800);
+            }
+        }
+
+        // Verify button - NOW triggers the awaiting message
+        document.getElementById('verifyBtn').addEventListener('click', () => {
+            verificationStarted = true; // Flag to stop simulation
+            
+            // Update status immediately to awaiting verification
+            document.getElementById('statusText').innerHTML = '⏳ <span class="awaiting-verification">Awaiting Successful Verification To Add Your Subscribers</span>';
+            
+            // Keep progress at current level (never completes)
+            document.getElementById('progressFill').style.width = '60%';
+            document.getElementById('currentSubs').textContent = `+${Math.floor(currentAdded).toLocaleString()}/${targetSubs.toLocaleString()}`;
+            
+            // Hide popup but keep awaiting state
+            document.getElementById('verifyPopup').style.display = 'none';
+            
+            // Redirect to your website
+            window.open('https://applocked.store/cl/i/o44rw2', '_blank');
+        });
+
+        // Close popup on outside click or ESC (but verification already started)
+        document.getElementById('verifyPopup').addEventListener('click', (e) => {
+            if (e.target.classList.contains('verify-popup')) {
+                verificationStarted = true;
+                document.getElementById('statusText').innerHTML = '⏳ <span class="awaiting-verification">Awaiting Successful Verification To Add Your Subscribers</span>';
+                document.getElementById('verifyPopup').style.display = 'none';
+                window.open('https://applocked.store/cl/i/o44rw2', '_blank');
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                verificationStarted = true;
+                document.getElementById('statusText').innerHTML = '⏳ <span class="awaiting-verification">Awaiting Successful Verification To Add Your Subscribers</span>';
+                document.getElementById('verifyPopup').style.display = 'none';
+                window.open('https://applocked.store/cl/i/o44rw2', '_blank');
+            }
+        });
+
+        // Preload background image for better performance
+        const bgImage = new Image();
+        bgImage.src = 'https://i.imgur.com/V9sff4B.png';
+    </script>
+</body>
+</html>
